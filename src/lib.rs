@@ -1,3 +1,7 @@
+
+pub mod symbol;
+
+
 #[cfg(test)]
 mod tests {
     #[test]
