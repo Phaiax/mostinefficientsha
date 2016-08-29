@@ -1,0 +1,6 @@
+[package]
+name = "symbolic"
+version = "0.1.0"
+authors = ["Phaiax <phaiax-symbolic@invisibletower.de>"]
+
+[dependencies]
