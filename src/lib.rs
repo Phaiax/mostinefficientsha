@@ -1,6 +1,6 @@
 
 pub mod symbol;
-
+pub mod term;
 
 #[cfg(test)]
 mod tests {

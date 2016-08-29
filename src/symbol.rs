@@ -5,6 +5,7 @@ use std::fmt;
 
 pub struct Symbol {
     pub name : String,
+    eval : RefCell<Option<f64>>,
     selfref : RefCell<Option<Weak<Symbol>>>,
 }
 
@@ -15,9 +16,18 @@ impl Symbol {
         let s = RSymbol::new(Symbol {
             name : name.into(),
             selfref : RefCell::default(),
+            eval : RefCell::default(),
         });
         *s.selfref.borrow_mut() = Some(Rc::downgrade(&s));
         s
+    }
+
+    pub fn evaluate(&self) -> f64 {
+        self.eval.borrow().expect(&format!("{:?} has no number", self))
+    }
+
+    pub fn set(&self, n : f64) {
+        *self.eval.borrow_mut() = Some(n);
     }
 }
 
