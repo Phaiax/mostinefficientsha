@@ -1,203 +1,156 @@
 
-use ::symbol::{Symbol, RSymbol};
 use std::fmt;
-use std::convert::From;
+use std::cell::Cell;
+use std::rc::{Rc};
 
 #[derive(Clone)]
-pub enum Term {
-    Symbol(RSymbol),
-    ConstantInt(i64),
-    ConstantDouble(f64),
-    Sum(BTerm, BTerm),
-    Difference(BTerm, BTerm),
-    Product(BTerm, BTerm),
-    Quotient(BTerm, BTerm),
+pub struct Term {
+    t : TermType,
+    cached_eval : Cell<Option<f64>>,
 }
 
-pub type BTerm = Box<Term>;
+#[derive(Clone)]
+pub enum TermType {
+    Symbol(Cell<Option<f64>>),
+    Constant(bool),
+    Xor(RTerm, RTerm),
+    And(RTerm, RTerm),
+    Or(RTerm, RTerm),
+    Not(RTerm),
+}
+
+pub type RTerm = Rc<Term>;
 
 impl Term {
-    pub fn from_symbol(symbol : &RSymbol) -> Term {
-        Term::Symbol(symbol.clone())
+    pub fn symbol() -> RTerm {
+        RTerm::new(Term{
+            t : TermType::Symbol(Cell::new(None)),
+            cached_eval : Cell::new(None),
+        })
     }
 
-
-    pub fn natural(c : i64) -> Term {
-        Term::ConstantInt(c)
+    pub fn constant(c : bool) -> RTerm {
+        RTerm::new(Term{
+            t : TermType::Constant(c),
+            cached_eval : Cell::new(Some( if c { 1. } else { 0. })),
+        })
     }
 
-    pub fn real(c : f64) -> Term {
-        Term::ConstantDouble(c)
+    pub fn xor (a : &RTerm, b : &RTerm) -> RTerm {
+        RTerm::new(Term{
+            t : TermType::Xor(a.clone(), b.clone()),
+            cached_eval : Cell::new(None),
+        })
     }
 
-    #[inline]
-    pub fn boxed(self) -> Box<Self> {
-        BTerm::new(self)
+    pub fn or (a : &RTerm, b : &RTerm) -> RTerm {
+        RTerm::new(Term{
+            t : TermType::Or(a.clone(), b.clone()),
+            cached_eval : Cell::new(None),
+        })
     }
 
     /// a + b
-    pub fn add<'a,'b,A,B> (a : &'a A, b : &'b B) -> Term
-        where Term: From<&'a A>, Term: From<&'b B> {
-        Term::Sum(Term::from(a).boxed(), Term::from(b).boxed())
-    }
-
-    /// a - b
-    pub fn sub<'a,'b,A,B> (a : &'a A, b : &'b B) -> Term
-        where Term: From<&'a A>, Term: From<&'b B> {
-        Term::Difference(Term::from(a).boxed(), Term::from(b).boxed())
-    }
-
-    /// a * b
-    pub fn mul<'a,'b,A,B> (a : &'a A, b : &'b B) -> Term
-        where Term: From<&'a A>, Term: From<&'b B> {
-        Term::Product(Term::from(a).boxed(), Term::from(b).boxed())
-    }
-
-    /// a / b
-    pub fn div<'a,'b,A,B> (a : &'a A, b : &'b B) -> Term
-        where Term: From<&'a A>, Term: From<&'b B> {
-        Term::Quotient(Term::from(a).boxed(), Term::from(b).boxed())
+    pub fn not (a : &RTerm) -> RTerm {
+        RTerm::new(Term{
+            t : TermType::Not(a.clone()),
+            cached_eval : Cell::new(None),
+        })
     }
 
     pub fn set(&self, n :f64) {
-        if let &Term::Symbol(ref s) = self {
-            s.set(n);
+        if let TermType::Symbol(ref s) = self.t {
+            s.set(Some(n));
         } else {
             panic!("Called set on non-symbol");
         }
     }
 
+    /// reset cache (recursive)
+    pub fn reset(&self) {
+        if self.cached_eval.get().is_some() {
+            match self.t {
+                TermType::Symbol(_) => {
+                    self.cached_eval.set(None);
+                },
+                TermType::Constant(_) => {},
+                TermType::Xor(ref a, ref b) => {
+                    self.cached_eval.set(None);
+                    a.reset();
+                    b.reset();
+                },
+                TermType::And(ref a, ref b) => {
+                    self.cached_eval.set(None);
+                    a.reset();
+                    b.reset();
+                },
+                TermType::Or(ref b, ref a) => {
+                    self.cached_eval.set(None);
+                    a.reset();
+                    b.reset();
+                },
+                TermType::Not(ref a) => {
+                    self.cached_eval.set(None);
+                    a.reset();
+                },
+            }
+        }
+    }
+
     pub fn evaluate(&self) -> f64 {
-        match *self {
-            Term::Symbol(ref s) => {
-                s.evaluate()
-            },
-            Term::ConstantInt(c) => {
-                c as f64
-            },
-            Term::ConstantDouble(c) => {
-                c
-            },
-            Term::Sum(ref a, ref b) => {
-                a.evaluate() + b.evaluate()
-            },
-            Term::Difference(ref a, ref b) => {
-                a.evaluate() - b.evaluate()
-            },
-            Term::Product(ref a, ref b) => {
-                a.evaluate() * b.evaluate()
-            },
-            Term::Quotient(ref a, ref b) => {
-                a.evaluate() / b.evaluate()
-            },
+        if let Some(c) = self.cached_eval.get() {
+            return c;
+        } else {
+            let v = match self.t {
+                TermType::Symbol(ref s) => {
+                    s.get().expect("Symbol not set. Eval failed.")
+                },
+                TermType::Constant(c) => {
+                    if c { 1. } else { 0. }
+                },
+                TermType::Xor(ref a, ref b) => {
+                    a.evaluate() * b.evaluate()
+                },
+                TermType::And(ref a, ref b) => {
+                    println!("NOT IMPLEMENTED");
+                    a.evaluate() * b.evaluate()
+                },
+                TermType::Or(ref b, ref a) => {
+                    println!("NOT IMPLEMENTED");
+                    a.evaluate() * b.evaluate()
+                },
+                TermType::Not(ref a) => {
+                    1. - a.evaluate()
+                },
+            };
+            self.cached_eval.set(Some(v));
+            return v;
         }
     }
 }
 
-impl<'a> From<&'a str> for Term {
-    fn from(s : &str) -> Self {
-        Self::from_symbol(&Symbol::new(&s))
-    }
-}
-
-impl From<RSymbol> for Term {
-    fn from(s : RSymbol) -> Self {
-        Self::from_symbol(&s)
-    }
-}
-
-impl<'a> From<&'a RSymbol> for Term {
-    fn from(s : &RSymbol) -> Self {
-        Self::from_symbol(&s)
-    }
-}
-
-impl From<i64> for Term {
-    fn from(c : i64) -> Self {
-        Self::natural(c)
-    }
-}
-
-impl From<f64> for Term {
-    fn from(c : f64) -> Self {
-        Self::real(c)
-    }
-}
-
-
-impl<'a> From<&'a Term> for Term {
-    fn from(c : &Term) -> Self {
-        c.clone()
-    }
-}
-
-
-
-use std::ops;
-
-
-macro_rules! op {
-    ($ops:ident, $opsfunc:ident, $termmethod:ident) => (
-
-        impl ops::$ops<Term> for Term {
-            type Output = Term;
-            fn $opsfunc(self, rhs: Term) -> Self::Output {
-                Term::$termmethod(&self, &rhs)
-            }
-        }
-
-        impl<'a> ops::$ops<Term> for &'a Term {
-            type Output = Term;
-            fn $opsfunc(self, rhs: Term) -> Self::Output {
-                Term::$termmethod(self, &rhs)
-            }
-        }
-
-        impl<'a> ops::$ops<&'a Term> for Term {
-            type Output = Term;
-            fn $opsfunc(self, rhs: &Term) -> Self::Output {
-                Term::$termmethod(&self, rhs)
-            }
-        }
-
-        impl<'a, 'b> ops::$ops<&'a Term> for &'b Term {
-            type Output = Term;
-            fn $opsfunc(self, rhs: &Term) -> Self::Output {
-                Term::$termmethod(self, rhs)
-            }
-        }
-    )
-}
-
-op!(Add, add, add);
-op!(Sub, sub, sub);
-op!(Div, div, div);
-op!(Mul, mul, mul);
 
 
 impl fmt::Debug for Term {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Term::Symbol(ref s) => {
-                write!(f, "{:?}", s)
+        match self.t {
+            TermType::Symbol(_) => {
+                write!(f, ":")
             },
-            Term::ConstantInt(c) => {
-                write!(f, "{}", c)
+            TermType::Constant(c) => {
+                write!(f, "{}", if c { 1 } else { 0 })
             },
-            Term::ConstantDouble(c) => {
-                write!(f, "{}", c)
+            TermType::Xor(ref a, ref b) => {
+                write!(f, "({:?} Xor {:?})", &a, &b)
             },
-            Term::Sum(ref a, ref b) => {
-                write!(f, "({:?} + {:?})", &a, &b)
+            TermType::And(ref a, ref b) => {
+                write!(f, "({:?} & {:?})", &a, &b)
             },
-            Term::Difference(ref a, ref b) => {
-                write!(f, "({:?} - {:?})", &a, &b)
+            TermType::Or(ref a, ref b) => {
+                write!(f, "{:?} | {:?}", &a, &b)
             },
-            Term::Product(ref a, ref b) => {
-                write!(f, "{:?} * {:?}", &a, &b)
-            },
-            Term::Quotient(ref a, ref b) => {
-                write!(f, "{:?} / {:?}", &a, &b)
+            TermType::Not(ref a) => {
+                write!(f, "! {:?}", &a)
             },
         }
     }
@@ -210,24 +163,7 @@ mod tests {
     use super::*;
     #[test]
     fn it_works() {
-        let a : Term = "x".into();
-        let b : Term = "y".into();
-        let p2 = &a + &b * &a / &b - &a;
-        //let p2 = &a + &b + &a;
-        let p = Term::add(&a, &b);
-        println!("{:?}", p);
-        println!("{:?}", p2);
-    }
 
-    #[test]
-    fn eval() {
-        let a : Term = "x".into();
-        let b : Term = "y".into();
-        let p2 = &a + &b * &a / &b - &a;
-        a.set(3.);
-        b.set(5.);
-        println!("{:?} = {}", p2, p2.evaluate());
     }
-
 
 }
