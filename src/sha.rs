@@ -16,6 +16,7 @@ impl Sha256 {
 
     pub fn new(mut data : Vec<U>, len_message_in_last_u_in_bits : usize) -> Sha256 {
 
+
         let mut h0 = U::from_const(0x6a09e667u32);
         let mut h1 = U::from_const(0xbb67ae85u32);
         let mut h2 = U::from_const(0x3c6ef372u32);
@@ -101,6 +102,7 @@ impl Sha256 {
                 w.push(nextw);
             }
 
+
             // Initialize working variables to current hash value:
             let mut a = h0.clone();
             let mut b = h1.clone();
@@ -121,7 +123,7 @@ impl Sha256 {
                 // S0 := (a rightrotate 2) xor (a rightrotate 13) xor (a rightrotate 22)
                 let s0 = a.rotate_right(2) ^ a.rotate_right(13) ^ a.rotate_right(22);
                 // maj := (a and b) xor (a and c) xor (b and c)
-                let maj = (&a & &b) ^ (&a & &c) ^ (&b ^ &c);
+                let maj = (&a & &b) ^ (&a & &c) ^ (&b & &c);
                 // temp2 := S0 + maj
                 let temp2 = &s0 + &maj;
 
@@ -202,18 +204,17 @@ mod tests {
     #[test]
     fn gen() {
         let data = vec![U::new_symbolic()];
+        data[0].clone().set_byte(b'a', 0);
+        data[0].clone().set_byte(b'\n', 1);
+
         let s = Sha256::new(data, 16);
 
-        let data : U = s.data[0].clone();
-        println!("{:?}", data);
-        data.set_byte(b'a', 0);
-        data.set_byte(b'\n', 1);
+        println!("{:?}", s.data[0].clone());
 
-        println!("Sha256('a') = {:?}", &s.hex());
-
-        //println!("{:?}", s.digest[0]);
-
-        assert!(false);
+        // 'a'   ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb
+        // 'a\n' 87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7
+        //assert_eq!(&s.hex().to_lowercase(), "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb");
+        assert_eq!(&s.hex().to_lowercase(), "87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7");
     }
 
     #[bench]

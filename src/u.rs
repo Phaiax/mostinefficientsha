@@ -323,4 +323,31 @@ mod tests {
         let u2 : U = a2.into();
         assert_eq!(a1 + a2, (u1 + u2).eval_to_u32());
     }
+
+    #[test]
+    fn endianess() {
+        let h0_psc : u32 = 0x6a09e667; // 6a is msb, 67 is lsb
+        let h1_psc : u32 = 0xbb67ae85;
+        let k0_psc : u32 = 0x428a2f98;
+        let k2_psc : u32 = 0xb5c0fbcf;
+
+
+        let h0_cpp : u32 = 1779033703;
+        let h1_cpp : u32 = -1150833019i32 as u32;
+        let k0_cpp : i32 = 1116352408;
+        let k2_cpp : i32 = -1245643825;
+
+        assert!(h0_psc == h0_cpp);
+        assert!(h1_psc == h1_cpp);
+        assert!(k0_psc == k0_cpp as u32);
+        assert!(k2_psc == k2_cpp as u32);
+
+        println!("{:?}", U::from_const(h0_psc));
+        println!("{:?}", U::from_const(h1_psc));
+        println!("{:?}", U::from_const(k0_psc));
+        println!("{:?}", U::from_const(k2_psc));
+
+        //assert!(false);
+
+    }
 }
