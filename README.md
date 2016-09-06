@@ -3,7 +3,7 @@ Most Inefficient Sha
 
 [Documentation](https://phaiax.github.io/mostinefficientsha/doc/mostinefficientsha/index.html)
 
-This crate tries to break SHA256. (But fails unfortunately).
+This crate tries to break SHA256. (But fails unfortunately^^).
 
 It implements SHA-256 in the most inefficient fashion ever. Usually, SHA-256 operates on integers with 32 bits (u32). This implementation uses one double (f64) for each bit of each integer, thereby allowing to use 8 fuzzy input bits for each input byte.
 
