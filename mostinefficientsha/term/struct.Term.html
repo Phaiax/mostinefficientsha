@@ -71,7 +71,7 @@ the leaves, that are either symbolic (0.0 to 1.0) or constant (0.0 or 1.0).</p>
 <p>During those lazy evaluations, every Term caches its value. This caching is not done for successive calls to the root term. It is instead important since some sub trees may be used by thousands of other terms. In other words, the flattened out structure may be very large. (Gigabytes if the logic structure of SHA256 is printed into an ascii file.)</p>
 
 <p>Use <code>reset()</code> to clear the cache.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../mostinefficientsha/term/struct.Term.html' title='mostinefficientsha::term::Term'>Term</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-104' class='srclink' href='../../src/mostinefficientsha/src/term.rs.html#47-373' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../mostinefficientsha/term/struct.Term.html' title='mostinefficientsha::term::Term'>Term</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-104' class='srclink' href='../../src/mostinefficientsha/src/term.rs.html#47-382' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.symbol' class='method'><span id='symbol.v' class='invisible'><code>fn <a href='#method.symbol' class='fnname'>symbol</a>() -&gt; <a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a></code></span></h4>
 <div class='docblock'><p>Create a <code>Symbol</code> type term with unassigned value. Assign value with <code>set()</code>.</p>
 </div><h4 id='method.c1' class='method'><span id='c1.v' class='invisible'><code>fn <a href='#method.c1' class='fnname'>c1</a>() -&gt; <a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a></code></span></h4>
@@ -111,8 +111,17 @@ Panics if the type is not <code>Symbol</code>.</p>
 <div class='docblock'><p>Reset the cached value of this term and all terms this term depends on.
 Does not reset anything if this term has already been reset.</p>
 </div><h4 id='method.evaluate' class='method'><span id='evaluate.v' class='invisible'><code>fn <a href='#method.evaluate' class='fnname'>evaluate</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></span></h4>
-<div class='docblock'><p>Evaluate this term by recursively evaluating all sub terms.
-Cache the evaluated value.</p>
+<div class='docblock'><p>Evaluate this term by recursively evaluating all sub terms.</p>
+
+<p>Cache the evaluated value.</p>
+
+<p><code>Xor: result = abs(1-b)</code></p>
+
+<p><code>And: result = a*b</code></p>
+
+<p><code>Or: result = min[ sqrt(a)+sqrt(b) , 1 ]</code></p>
+
+<p><code>Not: result = 1-a</code></p>
 </div><h4 id='method.max_logic_depth_and_max_stack_size' class='method'><span id='max_logic_depth_and_max_stack_size.v' class='invisible'><code>fn <a href='#method.max_logic_depth_and_max_stack_size' class='fnname'>max_logic_depth_and_max_stack_size</a>(&amp;self, stack_cnt: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></span></h4>
 <div class='docblock'><p>Stack size needed when evaluating this <code>Term</code> recursively.
 The stack_cnt is the current stack size. (Use 0 at the root term).
@@ -137,7 +146,7 @@ tree would have been flattened.</p>
 <div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
 </div><h4 id='method.clone_from' class='method'><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
 <div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../mostinefficientsha/term/struct.Term.html' title='mostinefficientsha::term::Term'>Term</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-208' class='srclink' href='../../src/mostinefficientsha/src/term.rs.html#377-400' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../mostinefficientsha/term/struct.Term.html' title='mostinefficientsha::term::Term'>Term</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-208' class='srclink' href='../../src/mostinefficientsha/src/term.rs.html#386-409' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
 </div></div></section>
