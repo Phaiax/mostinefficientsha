@@ -1,4 +1,5 @@
 
 default:
-	g++ -o csha cpp/sha.c
-	./csha
+	mkdir -p target/cpp
+	g++ -o target/cpp/sha cpp/sha.c
+	./target/cpp/sha

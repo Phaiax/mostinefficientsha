@@ -1,3 +1,4 @@
+//! `u::U`: A fuzzy 32bit integer
 
 use ::term::{RTerm, Term};
 use std::convert::From;
@@ -5,15 +6,42 @@ use std::fmt;
 use arrayvec::ArrayVec;
 use std::cmp::max;
 
+/// This type represents a u32, an unsigned number made of 32 bits.
+/// The bits are not boolean, but represented by a lazily evaluated tree of
+/// `Term`s.
+///
+/// This type implements some arithmetic operations on `u32`s that translate
+/// into bit operations under the hood. For example the + operation is translated
+/// into half adders and full adders, that themselves consist of bit operations
+/// like and and or.
+///
+/// This type implements all operations needed to calculate a sha256 hash:
+/// `rotate_right`, `shift_right >>`, Addition `+` and the bitwise operations
+/// `and &`, `xor ^` and `not !`. Use the member functions or the implemented
+/// operators. See `sha.rs` for example use.
+///
+/// This U can be constructed from a u32 constant number. The bits of that
+/// number will translate into `Term`s of type `Constant`.
+///
+/// It can be constructed by creating 32 new symbolic `Term`s.
+///
+/// It can also be constructed by using operations like `>>`.
+///
+/// After construction, the bits can be manipulated using the `bits` field
+/// of this struct.
 #[derive(Clone)]
 pub struct U {
-    /// The LSB is bits[0], the MSB = bits[31]
-    /// Push LSB first
+    /// The LSBit is bits[0], the MSBit is bits[31]. The byte order is big endian.
+    /// Push LSB first.
     pub bits : ArrayVec<[RTerm ; 32]>,
 }
 
 impl U {
 
+    /// Create a new `U` with 32 `Term`s of type `Symbol`. Do not forget to
+    /// set the value of each symbol afterwards. You can set the value of each
+    /// bit by using `my_u.bits[22].set(0.3f64)`. Or set 8 bits of this `U` with
+    /// `my_u.set_byte('e', 2)`.
     pub fn new_symbolic() -> U {
         let mut u = U { bits : ArrayVec::new() };
         for _ in 0..32 {
@@ -22,58 +50,110 @@ impl U {
         u
     }
 
+    /// Create a new `U` with 32 `Term`s of type `Constant`.
     pub fn from_const(mut c : u32) -> U {
         let mut u = U { bits : ArrayVec::new() };
         for _ in 0..32 {
-            // print!("{:?} ", c);
             u.bits.push(Term::constant(c & 1u32 == 1u32));
-            c = c >> 1;
+            c = c >> 1; // c is little endian, but >> delivers the bits from LSBit to MSBit.
         }
         u
     }
 
-    /// first byte is that on the MSB side
-    pub fn set_byte(&self,mut content : u8, bytenum : usize) {
+    /// Sets the bits of one byte of this u32 to their min/max values 1.0 and 0.0 depending on `set_value`.
+    /// `bytenum` must be one of 0, 1, 2, 3.
+    /// Byte 0 is the most significant byte of the four byte representation of this u32.
+    ///
+    /// Panics if the relevant bits/`Term`s of this `U` are not of type `Symbol`.
+    pub fn set_byte(&self,mut set_value : u8, bytenum : usize) {
         assert!(bytenum <= 3);
+        // LSByte 3: bits[8..0]
+        // MSByte 0: bits[32..24]
         for b in self.bits.iter().skip((3-bytenum)*8).take(8) {
-            b.set((content & 1u8) as u8 as f64);
-            content = content >> 1;
+            b.set((set_value & 1u8) as u8 as f64);
+            set_value = set_value >> 1;
         }
     }
 
-    pub fn eval_to_u32(&self) -> u32 {
-        let mut out = 0;
-        for b in self.bits.iter().rev() {
-            let v = b.evaluate();
-            out = out << 1;
-            if v >= 0.5 {
-                out = out | 1u32;
-            }
-            // print!("{:?} ", out);
-        }
-        out
+    /// Sets all bits of this `U` to a value dependend on `bytes`. See `set_byte()` for details.
+    ///
+    /// Panics if any bit/`Term` of this `U` is not of type `Symbol`.
+    pub fn set_bytes(&self, bytes : &[u8]) {
+        self.set_byte(bytes[0], 0);
+        self.set_byte(bytes[1], 1);
+        self.set_byte(bytes[2], 2);
+        self.set_byte(bytes[3], 3);
     }
 
-    /// note: manually call reset() before
-    pub fn max_stack_size(&self) -> (usize, usize) {
-        self.bits.iter().rev().map(|u| u.max_stack_size(0))
-                              .fold((0,0), |maxmax, umax| {
-                                    (max(maxmax.0, umax.0),
-                                     max(maxmax.1, umax.1))
-                              })
-    }
-
-    /// note: manually call reset() before
-    pub fn nr_of_terms(&self) -> usize {
-        self.bits.iter().map(|u| u.nr_of_terms()).sum()
-    }
-
+    /// Recursively resets the cache of this self's bits/`Term`s and the `Term`s self's `Term`s depend on.
+    ///
+    /// This need to be called after and before using `nr_of_terms()`,
+    /// `nr_of_terms_flattened()` and `max_logic_depth_and_max_stack_size()`.
+    ///
+    /// It also needs to be called before `evaluate()` and `eval_to_u32()`, but
+    /// only if a symbolic `Term` has been modified.
     pub fn reset(&self) {
         for b in self.bits.iter() {
             b.reset();
         }
     }
 
+    /// Evaluates all bits to a f64 value. Push these values to `out`.
+    /// Pushes the MSBit first.
+    pub fn evaluate<'a>(&self, out : &mut Vec<f64>) {
+        for b in self.bits.iter().rev() {
+            out.push(b.evaluate());
+        }
+    }
+
+    /// Evaluate all bits to a `f64` value, then round that value to 0 or 1
+    /// and assemble a `u32` with these bits.
+    pub fn eval_to_u32(&self) -> u32 {
+        let mut out = 0;
+        for b in self.bits.iter().rev().map(|b| b.evaluate() >= 0.5) {
+            out = out << 1; // << is independend of the little endian nature of out.
+            if b {
+                out = out | 1u32;
+            }
+        }
+        out
+    }
+
+
+    /// Max stack size needed when evaluating each bit of this `U` recursively.
+    ///
+    /// It also returns the maximum logic depth.
+    ///
+    /// Returns: (max_logic_depth, max_stacksize)
+    ///
+    /// Note: manually call reset() before using this function.
+    pub fn max_logic_depth_and_max_stack_size(&self) -> (usize, usize) {
+        self.bits.iter().rev().map(|b| b.max_logic_depth_and_max_stack_size(0))
+                              .fold((0,0), |maxmax, umax| {
+                                    (max(maxmax.0, umax.0),
+                                     max(maxmax.1, umax.1))
+                              })
+    }
+
+    /// Returns the number of `RTerms` that contribute to the evaluation of this `U`.
+    ///
+    /// Note: manually call reset() before using this function.
+    pub fn nr_of_terms(&self) -> usize {
+        self.bits.iter().map(|u| u.nr_of_terms()).sum()
+    }
+
+
+    /// Returns the number of `Term`s that contribute to the evaluation of this `U` if the
+    /// tree would have been flattened for each bit and subtree.
+    ///
+    /// Note: manually call reset() before using this function.
+    pub fn nr_of_terms_flattened(&self) -> usize {
+        self.bits.iter().map(|u| u.nr_of_terms_flattened()).sum()
+    }
+
+    /// Returns a new `U` that evaluates to `self`s value, but bitrotated by `x`
+    /// to the right. Rotation happens without any carry bit.
+    /// `x` must be less or equal 32.
     pub fn rotate_right(&self, x : usize) -> U {
         let mut u = U { bits : ArrayVec::new() };
         // Old   :     1000 0000 1100 0000 1010 0000 1001 0011
@@ -88,6 +168,9 @@ impl U {
         u
     }
 
+    /// Returns a new `U` that evaluates to `self`s value, but bitshifted by `x`
+    /// to the right.
+    /// `x` must be less than 32.
     pub fn shift_right(&self, x : usize) -> U {
         let mut u = U { bits : ArrayVec::new() };
         // Old   :     1000 0000 1100 0000 1010 0000 1001 0011
@@ -102,6 +185,7 @@ impl U {
         u
     }
 
+    /// Returns a new `U` that evaluates to the bitwise xor with `rhs`.
     pub fn xor(&self, rhs : &U) -> U {
         let mut u = U { bits : ArrayVec::new() };
         for (b1, b2) in self.bits.iter().zip(rhs.bits.iter()) {
@@ -109,6 +193,8 @@ impl U {
         }
         u
     }
+
+    /// Returns a new `U` that evaluates to the bitwise and with `rhs`.
     pub fn and(&self, rhs : &U) -> U {
         let mut u = U { bits : ArrayVec::new() };
         for (b1, b2) in self.bits.iter().zip(rhs.bits.iter()) {
@@ -116,6 +202,8 @@ impl U {
         }
         u
     }
+
+    /// Returns a new `U` that evaluates to the bitwise not with `rhs`.
     pub fn not(&self) -> U {
         let mut u = U { bits : ArrayVec::new() };
         for b in self.bits.iter() {
@@ -123,6 +211,8 @@ impl U {
         }
         u
     }
+
+    /// Returns a new `U` that evaluates to the arithmethic addition with `rhs`.
     pub fn add(&self, rhs : &U) -> U {
         let mut u = U { bits : ArrayVec::new() };
         let (s, mut c) = Term::half_add(&self.bits[0], &rhs.bits[0]);
@@ -135,8 +225,6 @@ impl U {
         u
     }
 
-
-
 }
 
 impl From<u32> for U {
@@ -145,20 +233,14 @@ impl From<u32> for U {
     }
 }
 
-//impl<'a> From<&'a U> for U {
-//    fn from(c : &U) -> Self {
-//        c.clone()
-//    }
-//}
-
 impl fmt::Debug for U {
     /// Debug: MSB...LSB
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        try!(write!(f, "U[ "));
+        try!(write!(f, "U["));
         for b in self.bits.iter().rev() {
             try!(b.fmt(f));
         }
-        write!(f, " ]")
+        write!(f, "]")
     }
 }
 
@@ -346,8 +428,6 @@ mod tests {
         println!("{:?}", U::from_const(h1_psc));
         println!("{:?}", U::from_const(k0_psc));
         println!("{:?}", U::from_const(k2_psc));
-
-        //assert!(false);
 
     }
 }
