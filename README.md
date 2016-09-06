@@ -1,7 +1,7 @@
 Most Inefficient Sha
 ========
 
-[Documentation](https://phaiax.github.io/mostinefficientsha/doc/mostinefficientsha/index.html)
+[Documentation](https://phaiax.github.io/mostinefficientsha/mostinefficientsha/index.html)
 
 This crate tries to break SHA256. (But fails unfortunately^^).
 
