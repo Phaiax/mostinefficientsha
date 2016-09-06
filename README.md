@@ -9,5 +9,9 @@ It implements SHA-256 in the most inefficient fashion ever. Usually, SHA-256 ope
 
 Processor: Intel(R) Core(TM)2 Duo CPU     P8400  @ 2.26GHz, 3072KB Cache
 
-Calculating SHA256 with one byte of input data takes 10 ms.
-Calculating SHA256 with one hundred bytes of input data takes 78 ms.
+* Calculating SHA256 with one byte of input data takes 10 ms.
+* Calculating SHA256 with one hundred bytes of input data takes 78 ms.
+
+## Why
+
+For fun. It seemed unlikely to work out but I wanted to do some rust.
