@@ -228,7 +228,7 @@ impl Term {
     ///
     /// Cache the evaluated value.
     ///
-    /// `Xor: result = abs(1-b)`
+    /// `Xor: result = abs(a-b)`
     ///
     /// `And: result = a*b`
     ///
