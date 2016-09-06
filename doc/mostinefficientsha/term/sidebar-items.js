@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["TermType","Types of Terms."]],"struct":[["Term","A `Term` is either constant, symbolic or the result of a logical operation of other terms."]],"type":[["RTerm","The always used Handle for any `Term`."]]});

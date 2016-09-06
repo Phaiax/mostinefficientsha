@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Linopt","Simple optimizer that tries to use the fuzzy Sha256 implementation to try to optimize to a target hash using a very simple linerarization algorithm."]]});

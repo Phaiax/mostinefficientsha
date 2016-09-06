@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["linopt","`linopt::Linopt`: Linear optimization"],["sha","`sha::Sha256`: Sha256 using `U`s."],["term","`term::Term`: A fuzzy bit."],["u","`u::U`: A fuzzy 32bit integer"],["util","Encoding helpers between ascii, u32 and f64 representations of 256 bit hashes."]]});

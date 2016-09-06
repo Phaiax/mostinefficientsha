@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Base` trait in crate `data_encoding`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Base">
+
+    <title>data_encoding::base::Base - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>data_encoding</a>::<wbr><a href='index.html'>base</a></p><script>window.sidebarCurrent = {name: 'Base', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content trait">
+<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>data_encoding</a>::<wbr><a href='index.html'>base</a>::<wbr><a class='trait' href=''>Base</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-31' class='srclink' href='../../src/data_encoding/base.rs.html#57-108' title='goto source code'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait Base {
+    fn <a href='#tymethod.pad' class='fnname'>pad</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>;
+    fn <a href='#tymethod.val' class='fnname'>val</a>(&amp;self, x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;;
+
+    fn <a href='#method.bit' class='fnname'>bit</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a> { ... }
+    fn <a href='#method.sym' class='fnname'>sym</a>(&amp;self, x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a> { ... }
+}</pre><div class='docblock'><p>Generic interface.</p>
+
+<p>A base implementation needs to define at least its padding <code>pad</code>
+and its symbol-to-value function <code>val</code>. Its power of two <code>bit</code> and
+its value-to-symbol function <code>sym</code> are uniquely defined from the
+<code>pad</code> and <code>val</code> functions. However, for performance reasons, all
+functions may be defined directly.</p>
+
+<h1 id='vocabulary' class='section-header'><a href='#vocabulary'>Vocabulary</a></h1>
+<p>We call <em>ascii</em> a 7-bit code represented as a <code>u8</code>. In other
+words, any <code>u8</code> value with most significant bit cleared (or
+equivalently, any <code>u8</code> value between 0 and 127 inclusive) is an
+ascii, and reciprocally.</p>
+
+<p>We call <em>value</em> a <em>b</em>-bit code represented as a <code>u8</code>, where <em>b</em> is
+the power of two of the base, <em>i.e.</em> 4 for <code>base16</code> and 6 for
+<code>base64</code> for instance. The values for <code>base64</code> are thus any <code>u8</code>
+value from 0 to 63, and similarly the values for <code>base16</code> are any
+<code>u8</code> value from 0 to 15. More generally, values are any <code>u8</code> value
+between 0 and 2<sup>b</sup> - 1 inclusive. Each symbol is uniquely
+associated to a value.</p>
+
+<p>We call <em>symbol</em> the symbols represented as ascii (as such, only
+ascii symbols are allowed). For instance, in <code>base64</code>, the symbols
+are the ascii from <code>A</code> to <code>Z</code>, the ascii from <code>a</code> to <code>z</code>, the
+ascii from <code>0</code> to <code>9</code>, the ascii <code>+</code>, and the ascii <code>/</code> in value
+order. And the <code>base16</code> symbols are the ascii from <code>0</code> to <code>9</code> and
+the ascii from <code>A</code> to <code>F</code>.</p>
+
+<p>We call <em>padding</em> the padding represented as ascii (as such, only
+ascii padding is allowed). For instance, the ascii <code>=</code> is used as
+the padding for <code>base64</code> and <code>base16</code>.</p>
+
+<h1 id='constraints' class='section-header'><a href='#constraints'>Constraints</a></h1>
+<p>The base interface comes with invariants which must be satisfied
+by all implementations. Although it cannot be checked, all
+implementations must be deterministic, <em>i.e.</em> they never return
+two different outputs for the same input and they never panic
+(unless specified otherwise). The other constraints are described
+in the <a href="enum.ValidError.html"><code>ValidError</code></a> enum and may be
+checked by the <a href="fn.valid.html"><code>valid</code></a> function. Implementations
+should also be pure.</p>
+</div>
+            <h2 id='required-methods'>Required Methods</h2>
+            <div class='methods'>
+        <h3 id='tymethod.pad' class='method stab '><span id='pad.v' class='invisible'><code>fn <a href='#tymethod.pad' class='fnname'>pad</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code></span></h3><div class='docblock'><p>Returns the padding.</p>
+</div><h3 id='tymethod.val' class='method stab '><span id='val.v' class='invisible'><code>fn <a href='#tymethod.val' class='fnname'>val</a>(&amp;self, x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code></span></h3><div class='docblock'><p>Returns the value of a symbol.</p>
+
+<p>This function defines what the symbols are, to which value
+they are associated, and the base size:</p>
+
+<ul>
+<li>A symbol is an input that does not return <code>None</code>.</li>
+<li>The value of a symbol is its associated output.</li>
+<li>The base size is the number of symbols.</li>
+</ul>
+
+<p>In other words, when <code>val(s)</code> returns:</p>
+
+<ul>
+<li><code>Some(v)</code>: <code>s</code> is a symbol with value <code>v</code>.</li>
+<li><code>None</code>: <code>s</code> is not a symbol.</li>
+</ul>
+</div></div>
+            <h2 id='provided-methods'>Provided Methods</h2>
+            <div class='methods'>
+        <h3 id='method.bit' class='method stab '><span id='bit.v' class='invisible'><code>fn <a href='#method.bit' class='fnname'>bit</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h3><div class='docblock'><p>Returns the power of two of the base.</p>
+</div><h3 id='method.sym' class='method stab '><span id='sym.v' class='invisible'><code>fn <a href='#method.sym' class='fnname'>sym</a>(&amp;self, x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code></span></h3><div class='docblock'><p>Returns the symbol of a value.</p>
+
+<p>This function must only be called on values.</p>
+
+<h1 id='panics' class='section-header'><a href='#panics'>Panics</a></h1>
+<p>May panic when input is not a value.</p>
+</div></div>
+        <h2 id='implementors'>Implementors</h2>
+        <ul class='item-list' id='implementors-list'>
+    <li><code>impl&lt;T&gt; Base for <a class='struct' href='../../data_encoding/base/struct.Opt.html' title='data_encoding::base::Opt'>Opt</a>&lt;T&gt;</code></li>
+<li><code>impl Base for <a class='struct' href='../../data_encoding/base/struct.Spec.html' title='data_encoding::base::Spec'>Spec</a></code></li>
+</ul><script type="text/javascript" async
+                         src="../../implementors/data_encoding/base/trait.Base.js">
+                 </script></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "data_encoding";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

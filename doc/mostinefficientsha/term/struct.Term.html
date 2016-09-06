@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Term` struct in crate `mostinefficientsha`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Term">
+
+    <title>mostinefficientsha::term::Term - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>mostinefficientsha</a>::<wbr><a href='index.html'>term</a></p><script>window.sidebarCurrent = {name: 'Term', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>mostinefficientsha</a>::<wbr><a href='index.html'>term</a>::<wbr><a class='struct' href=''>Term</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-72' class='srclink' href='../../src/mostinefficientsha/src/term.rs.html#28-31' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Term {
+    // some fields omitted
+}</pre><div class='docblock'><p>A <code>Term</code> is either <a href="enum.TermType.html">constant, symbolic or the result of a logical operation
+of other terms</a>.</p>
+
+<p>A <code>Term</code> can be evaluated to a f64 fuzzy bit that is between 0 and 1.</p>
+
+<p>During later use, many <code>Term</code>s will span some large trees of logic operations.
+The root <code>term</code> of each tree should then be lazily evaluated if needed. The f64
+evaluation result depends on the type of operation the tree consists of and
+the leaves, that are either symbolic (0.0 to 1.0) or constant (0.0 or 1.0).</p>
+
+<ul>
+<li>The <code>Term</code> can be <code>Constant</code>. Its value is either <code>false=0.0</code> or <code>true=1.0</code>. Constants are shortcutted during Term creation. For example the <code>and</code>-operation between a <code>false</code> constant and another arbitrary <code>Term</code> will result in a constant <code>false</code> because <code>false &amp; a == false</code>.</li>
+<li>The <code>Term</code> can be <code>Symbolic</code>. Its value is a number between 0.0 and 1.0. In contrast to constants, symbols can not be short cut. During later use, you will set all symbols to choosen values and then evaluate the root term.</li>
+<li>The <code>Term</code> can be a logical operation. Currently implemented are: <code>Xor ^</code>, <code>And &amp;</code>, <code>Or |</code> and <code>Not !</code>. Except for <code>Not</code>, all Terms take two operands.</li>
+</ul>
+
+<p>The implementation uses reference counted terms <code>RTerm = Rc&lt;Term&gt;</code> to prevent copying large parts of trees and allow caching during evaluations. This makes the <code>Term</code> network structure not a tree, but an acyclic directed graph with multiple roots, I guess.</p>
+
+<p>During those lazy evaluations, every Term caches its value. This caching is not done for successive calls to the root term. It is instead important since some sub trees may be used by thousands of other terms. In other words, the flattened out structure may be very large. (Gigabytes if the logic structure of SHA256 is printed into an ascii file.)</p>
+
+<p>Use <code>reset()</code> to clear the cache.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../mostinefficientsha/term/struct.Term.html' title='mostinefficientsha::term::Term'>Term</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-104' class='srclink' href='../../src/mostinefficientsha/src/term.rs.html#47-373' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.symbol' class='method'><span id='symbol.v' class='invisible'><code>fn <a href='#method.symbol' class='fnname'>symbol</a>() -&gt; <a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a></code></span></h4>
+<div class='docblock'><p>Create a <code>Symbol</code> type term with unassigned value. Assign value with <code>set()</code>.</p>
+</div><h4 id='method.c1' class='method'><span id='c1.v' class='invisible'><code>fn <a href='#method.c1' class='fnname'>c1</a>() -&gt; <a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a></code></span></h4>
+<div class='docblock'><p>Shortcut for creating a <code>true</code> constant.</p>
+</div><h4 id='method.c0' class='method'><span id='c0.v' class='invisible'><code>fn <a href='#method.c0' class='fnname'>c0</a>() -&gt; <a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a></code></span></h4>
+<div class='docblock'><p>Shortcut for creating a <code>false</code> constant.</p>
+</div><h4 id='method.constant' class='method'><span id='constant.v' class='invisible'><code>fn <a href='#method.constant' class='fnname'>constant</a>(c: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a></code></span></h4>
+<div class='docblock'><p>Create a <code>Constant</code> type term with given value.</p>
+</div><h4 id='method.is_const' class='method'><span id='is_const.v' class='invisible'><code>fn <a href='#method.is_const' class='fnname'>is_const</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
+<div class='docblock'><p>Checks if this term is of type constant.</p>
+</div><h4 id='method.const_val' class='method'><span id='const_val.v' class='invisible'><code>fn <a href='#method.const_val' class='fnname'>const_val</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
+<div class='docblock'><p>Returns the constant value of this <code>Term</code>.
+Panics if type is not <code>Constant</code>.</p>
+</div><h4 id='method.xor' class='method'><span id='xor.v' class='invisible'><code>fn <a href='#method.xor' class='fnname'>xor</a>(a: &amp;<a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>, b: &amp;<a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>) -&gt; <a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a></code></span></h4>
+<div class='docblock'><p>Creates a new <code>RTerm</code> that lazily evaluates to the xor operation <code>a ^ b</code>
+of the two input terms.</p>
+</div><h4 id='method.or' class='method'><span id='or.v' class='invisible'><code>fn <a href='#method.or' class='fnname'>or</a>(a: &amp;<a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>, b: &amp;<a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>) -&gt; <a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a></code></span></h4>
+<div class='docblock'><p>Creates a new <code>RTerm</code> that lazily evaluates to the or operation <code>a | b</code>
+of the two input terms.</p>
+</div><h4 id='method.and' class='method'><span id='and.v' class='invisible'><code>fn <a href='#method.and' class='fnname'>and</a>(a: &amp;<a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>, b: &amp;<a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>) -&gt; <a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a></code></span></h4>
+<div class='docblock'><p>Creates a new <code>RTerm</code> that lazily evaluates to the and operation <code>a &amp; b</code>
+of the two input terms.</p>
+</div><h4 id='method.not' class='method'><span id='not.v' class='invisible'><code>fn <a href='#method.not' class='fnname'>not</a>(a: &amp;<a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>) -&gt; <a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a></code></span></h4>
+<div class='docblock'><p>Creates a new <code>RTerm</code> that lazily evaluates to the not operation <code>!a</code>
+of the input term.</p>
+</div><h4 id='method.half_add' class='method'><span id='half_add.v' class='invisible'><code>fn <a href='#method.half_add' class='fnname'>half_add</a>(a: &amp;<a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>, b: &amp;<a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>, <a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></span></h4>
+<div class='docblock'><p>Shortcut for (  a<sup>b</sup>  ,  a&amp;b  ). The first term is the sum bit of a logic
+half adder, the second term is the carry bit.</p>
+</div><h4 id='method.full_add' class='method'><span id='full_add.v' class='invisible'><code>fn <a href='#method.full_add' class='fnname'>full_add</a>(a: &amp;<a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>, b: &amp;<a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>, carry: &amp;<a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a>, <a class='type' href='../../mostinefficientsha/term/type.RTerm.html' title='mostinefficientsha::term::RTerm'>RTerm</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></span></h4>
+<div class='docblock'><p>Shortcut for (  a<sup>b<sup>c</sup></sup>  ,  (a&amp;b)<sup>c&amp;(a<sup>b</sup></sup>)  ).
+The first term is the sum bit of a logic full adder,
+the second term is the carry bit.</p>
+</div><h4 id='method.set' class='method'><span id='set.v' class='invisible'><code>fn <a href='#method.set' class='fnname'>set</a>(&amp;self, n: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>)</code></span></h4>
+<div class='docblock'><p>Sets the value of a <code>Symbol</code> type term.
+Panics if the type is not <code>Symbol</code>.</p>
+</div><h4 id='method.reset' class='method'><span id='reset.v' class='invisible'><code>fn <a href='#method.reset' class='fnname'>reset</a>(&amp;self)</code></span></h4>
+<div class='docblock'><p>Reset the cached value of this term and all terms this term depends on.
+Does not reset anything if this term has already been reset.</p>
+</div><h4 id='method.evaluate' class='method'><span id='evaluate.v' class='invisible'><code>fn <a href='#method.evaluate' class='fnname'>evaluate</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></span></h4>
+<div class='docblock'><p>Evaluate this term by recursively evaluating all sub terms.
+Cache the evaluated value.</p>
+</div><h4 id='method.max_logic_depth_and_max_stack_size' class='method'><span id='max_logic_depth_and_max_stack_size.v' class='invisible'><code>fn <a href='#method.max_logic_depth_and_max_stack_size' class='fnname'>max_logic_depth_and_max_stack_size</a>(&amp;self, stack_cnt: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></span></h4>
+<div class='docblock'><p>Stack size needed when evaluating this <code>Term</code> recursively.
+The stack_cnt is the current stack size. (Use 0 at the root term).
+It also returns the maximum logic depth. This value is created by
+utilizing the eval cache. So you must call <code>reset()</code> before and after
+using this function.</p>
+
+<p>Returns: (max_logic_depth, max_stacksize)</p>
+</div><h4 id='method.nr_of_terms' class='method'><span id='nr_of_terms.v' class='invisible'><code>fn <a href='#method.nr_of_terms' class='fnname'>nr_of_terms</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h4>
+<div class='docblock'><p>Returns the number of RTerms that contribute to the evaluation of this RTerm.
+This function uses the eval cache, so you must call <code>reset()</code> before and
+after using this function.
+To prevent double counting, this function returns the actual number on
+the first call and zero on all following calls.</p>
+
+<p>Returns: number_of_uncounted_rterms_including_this_rterm</p>
+</div><h4 id='method.nr_of_terms_flattened' class='method'><span id='nr_of_terms_flattened.v' class='invisible'><code>fn <a href='#method.nr_of_terms_flattened' class='fnname'>nr_of_terms_flattened</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h4>
+<div class='docblock'><p>Returns the number of Terms that contribute to the evaluation if the
+tree would have been flattened.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../../mostinefficientsha/term/struct.Term.html' title='mostinefficientsha::term::Term'>Term</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-67' class='srclink' href='../../src/mostinefficientsha/src/term.rs.html#8' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class='method'><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../../mostinefficientsha/term/struct.Term.html' title='mostinefficientsha::term::Term'>Term</a></code></span></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class='method'><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../mostinefficientsha/term/struct.Term.html' title='mostinefficientsha::term::Term'>Term</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-208' class='srclink' href='../../src/mostinefficientsha/src/term.rs.html#377-400' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "mostinefficientsha";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

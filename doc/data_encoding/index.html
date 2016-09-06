@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `data_encoding` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, data_encoding">
+
+    <title>data_encoding - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'></p><script>window.sidebarCurrent = {name: 'data_encoding', ty: 'mod', relpath: '../'};</script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>data_encoding</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-0' class='srclink' href='../src/data_encoding/lib.rs.html#1-321' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>This <a href="https://crates.io/crates/data-encoding">crate</a> provides
+generic data encoding functions.</p>
+
+<p>Encoding and decoding functions with and without allocation are
+provided for common bases. Those functions are instantiated from
+generic functions using a base interface described in module
+<a href="base/index.html"><code>base</code></a>. The generic encoding and decoding
+functions are defined in the <a href="encode/index.html"><code>encode</code></a> and
+<a href="decode/index.html"><code>decode</code></a> modules respectively.</p>
+
+<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>data_encoding</span>::<span class='ident'>hex</span>;
+<span class='kw'>use</span> <span class='ident'>data_encoding</span>::<span class='ident'>base64</span>;
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>hex</span>::<span class='ident'>encode</span>(<span class='string'>b&quot;some raw data&quot;</span>), <span class='string'>&quot;736F6D65207261772064617461&quot;</span>);
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>base64</span>::<span class='ident'>decode</span>(<span class='string'>b&quot;c29tZSByYXcgZGF0YQ==&quot;</span>).<span class='ident'>unwrap</span>(), <span class='string'>b&quot;some raw data&quot;</span>);</pre>
+
+<p>A more involved example is available in the <code>examples</code> directory.
+It is similar to the <code>base64</code> GNU program, but it works for all
+common bases and also for custom bases defined at runtime. The
+<code>make encode</code> command builds this example in
+<code>target/release/examples/encode</code>.</p>
+
+<h1 id='conformance' class='section-header'><a href='#conformance'>Conformance</a></h1>
+<p>This crate is meant to be conform. The
+<a href="base16/index.html"><code>base16</code></a>, <a href="index.html#reexports"><code>hex</code></a>,
+<a href="base32/index.html"><code>base32</code></a>,
+<a href="base32hex/index.html"><code>base32hex</code></a>,
+<a href="base64/index.html"><code>base64</code></a>, and
+<a href="base64url/index.html"><code>base64url</code></a> modules conform to <a href="https://tools.ietf.org/html/rfc4648">RFC
+4648</a>.</p>
+
+<h1 id='properties' class='section-header'><a href='#properties'>Properties</a></h1>
+<p>This crate is meant to provide strong properties. The encoding and
+decoding functions satisfy the following properties:</p>
+
+<ul>
+<li>They are deterministic: their output only depends on their input.</li>
+<li>They have no side-effects: they do not modify a hidden mutable
+state.</li>
+<li>They never panic, although the decoding function may return a
+decoding error on invalid input.</li>
+<li>They are inverse of each other:
+
+<ul>
+<li>For all <code>data: Vec&lt;u8&gt;</code>, we have
+<code>decode(encode(&amp;data).as_bytes()) == Ok(data)</code>.</li>
+<li>For all <code>repr: String</code>, if there is <code>data: Vec&lt;u8&gt;</code> such that
+<code>decode(repr.as_bytes()) == Ok(data)</code>, then <code>encode(&amp;data) == repr</code>.</li>
+</ul></li>
+</ul>
+
+<p>This last property, that <code>encode</code> and <code>decode</code> are inverse of each
+other, is usually not satisfied by common <code>base64</code>
+implementations, like the <code>rustc-serialize</code> crate or the <code>base64</code>
+GNU program. This is a matter of choice, and this crate has made
+the choice to guarantee canonical encoding as described by
+<a href="https://tools.ietf.org/html/rfc4648#section-3.5">section 3.5</a> of
+the RFC.</p>
+
+<p>Since the RFC specifies <code>encode</code> on all inputs and <code>decode</code> on all
+possible <code>encode</code> outputs, the differences between implementations
+come from the <code>decode</code> function which may be more or less
+permissive. In this crate, the <code>decode</code> function rejects all
+inputs that are not a possible output of the <code>encode</code> function. A
+pre-treatment of the input has to be done to be more permissive
+(see the example of the <code>examples</code> directory). Here are some
+concrete examples of decoding differences between this crate, the
+<code>rustc-serialize</code> crate, and the <code>base64</code> GNU program:</p>
+
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th><code>data-encoding</code></th>
+<th><code>rustc-serialize</code></th>
+<th>GNU <code>base64</code></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>AAB=</code></td>
+<td><code>Err(BadPadding)</code></td>
+<td><code>Ok(vec![0, 0])</code></td>
+<td><code>\x00\x00</code></td>
+</tr>
+<tr>
+<td><code>AA\nB=</code></td>
+<td><code>Err(BadLength)</code></td>
+<td><code>Ok(vec![0, 0])</code></td>
+<td><code>\x00\x00</code></td>
+</tr>
+<tr>
+<td><code>AAB</code></td>
+<td><code>Err(BadLength)</code></td>
+<td><code>Ok(vec![0, 0])</code></td>
+<td>Invalid input</td>
+</tr>
+<tr>
+<td><code>A\rA\nB=</code></td>
+<td><code>Err(BadLength)</code></td>
+<td><code>Ok(vec![0, 0])</code></td>
+<td>Invalid input</td>
+</tr>
+<tr>
+<td><code>-_\r\n</code></td>
+<td><code>Err(BadCharacter(0))</code></td>
+<td><code>Ok(vec![251])</code></td>
+<td>Invalid input</td>
+</tr>
+</tbody>
+</table>
+
+<p>We can summarize these discrepancies as follows:</p>
+
+<table>
+<thead>
+<tr>
+<th>Discrepancy</th>
+<th><code>data-encoding</code></th>
+<th><code>rustc-serialize</code></th>
+<th>GNU <code>base64</code></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Non-significant bits before padding may be non-null</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Non-alphabet ignored characters</td>
+<td>None</td>
+<td><code>\r</code> and <code>\n</code></td>
+<td><code>\n</code></td>
+</tr>
+<tr>
+<td>Non-alphabet translated characters</td>
+<td>None</td>
+<td><code>-_</code> mapped to <code>+/</code></td>
+<td>None</td>
+</tr>
+<tr>
+<td>Padding is optional</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+
+<p>This crate may provide wrappers to accept these discrepancies in a
+generic way at some point in the future.</p>
+
+<h1 id='performance' class='section-header'><a href='#performance'>Performance</a></h1>
+<p>This crate is meant to be efficient. It has comparable performance
+to the <code>rustc-serialize</code> crate and the <code>base64</code> GNU program. The
+<code>make bench</code> command runs some benchmarks using cargo and a shell
+script.</p>
+</div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
+<table><tr><td><code>pub use <a class='mod' href='../data_encoding/base16/index.html' title='data_encoding::base16'>base16</a> as hex;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='base/index.html'
+                                  title='data_encoding::base'>base</a></td>
+                           <td class='docblock short'>
+                                <p>Generic base module.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='base16/index.html'
+                                  title='data_encoding::base16'>base16</a></td>
+                           <td class='docblock short'>
+                                <p>Base 16 Encoding.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='base2/index.html'
+                                  title='data_encoding::base2'>base2</a></td>
+                           <td class='docblock short'>
+                                <p>Base 2 Encoding.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='base32/index.html'
+                                  title='data_encoding::base32'>base32</a></td>
+                           <td class='docblock short'>
+                                <p>Base 32 Encoding.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='base32hex/index.html'
+                                  title='data_encoding::base32hex'>base32hex</a></td>
+                           <td class='docblock short'>
+                                <p>Base 32 Encoding with Extended Hex Alphabet.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='base4/index.html'
+                                  title='data_encoding::base4'>base4</a></td>
+                           <td class='docblock short'>
+                                <p>Base 4 Encoding.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='base64/index.html'
+                                  title='data_encoding::base64'>base64</a></td>
+                           <td class='docblock short'>
+                                <p>Base 64 Encoding.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='base64url/index.html'
+                                  title='data_encoding::base64url'>base64url</a></td>
+                           <td class='docblock short'>
+                                <p>Base 64 Encoding with URL and Filename Safe Alphabet.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='base8/index.html'
+                                  title='data_encoding::base8'>base8</a></td>
+                           <td class='docblock short'>
+                                <p>Base 8 Encoding.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='decode/index.html'
+                                  title='data_encoding::decode'>decode</a></td>
+                           <td class='docblock short'>
+                                <p>Generic decoding module.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='encode/index.html'
+                                  title='data_encoding::encode'>encode</a></td>
+                           <td class='docblock short'>
+                                <p>Generic encoding module.</p>
+                           </td>
+                       </tr></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "data_encoding";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script defer src="../search-index.js"></script>
+</body>
+</html>

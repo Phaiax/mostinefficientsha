@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Sha256` struct in crate `mostinefficientsha`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Sha256">
+
+    <title>mostinefficientsha::sha::Sha256 - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>mostinefficientsha</a>::<wbr><a href='index.html'>sha</a></p><script>window.sidebarCurrent = {name: 'Sha256', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>mostinefficientsha</a>::<wbr><a href='index.html'>sha</a>::<wbr><a class='struct' href=''>Sha256</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-444' class='srclink' href='../../src/mostinefficientsha/src/sha.rs.html#22-28' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Sha256 {
+    pub data: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../mostinefficientsha/u/struct.U.html' title='mostinefficientsha::u::U'>U</a>&gt;,
+    pub input_data_len_in_bits: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>,
+    pub digest: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../mostinefficientsha/u/struct.U.html' title='mostinefficientsha::u::U'>U</a>&gt;,
+}</pre><div class='docblock'><p>This struct does a lazy SHA-256 hash calculation with fuzzy <code>f64</code> bits.
+It first creates a tree
+of thouthands of <code>Term</code>s that represent the bitwise calculations needed to
+calculate the final hash. It then calculates that hash by evaluating the
+<code>Term</code>s that represent the bits of the final 256 bit hash value.</p>
+
+<p>It can do this evaluation to <code>f64</code> fuzzy bits or to a
+<code>[8;u32]</code> or ascii representation of the hash by rounding the <code>f64</code>s.</p>
+
+<p>The input data is made of <code>Symbol</code> type <code>Term</code>s, that have to be set before
+evaluation.</p>
+</div><h2 class='fields'>Fields</h2><span id='structfield.data' class='structfield'>
+                           <span id='data.v' class='invisible'>
+                           <code>data: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../mostinefficientsha/u/struct.U.html' title='mostinefficientsha::u::U'>U</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The original input data. Some of the trailing bits may have been replaced. See <code>new()</code>.</p>
+</div><span id='structfield.input_data_len_in_bits' class='structfield'>
+                           <span id='input_data_len_in_bits.v' class='invisible'>
+                           <code>input_data_len_in_bits: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code>
+                           </span></span><span class='stab '></span><span id='structfield.digest' class='structfield'>
+                           <span id='digest.v' class='invisible'>
+                           <code>digest: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../mostinefficientsha/u/struct.U.html' title='mostinefficientsha::u::U'>U</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The final tree structure is hidden here.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../mostinefficientsha/sha/struct.Sha256.html' title='mostinefficientsha::sha::Sha256'>Sha256</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-448' class='srclink' href='../../src/mostinefficientsha/src/sha.rs.html#31-248' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>(data: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../mostinefficientsha/u/struct.U.html' title='mostinefficientsha::u::U'>U</a>&gt;, len_message_in_last_u_in_bits: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../../mostinefficientsha/sha/struct.Sha256.html' title='mostinefficientsha::sha::Sha256'>Sha256</a></code></span></h4>
+<div class='docblock'><p>Create a new tree of <code>Term</code>s, that lazily calculates the SHA-256 hash of <code>data</code>.</p>
+
+<p><code>len_message_in_last_u_in_bits</code> is the number of bits in <code>data.last()</code> that
+are part of the input data. All following bits in <code>data.last()</code> will be
+ignored (and replaced).</p>
+
+<p>You can access <code>data</code> afterwards using the <code>data</code> field.</p>
+
+<p>This function just does SHA-256, but with <code>U</code>s instead of <code>u32</code>s.</p>
+</div><h4 id='method.reset' class='method'><span id='reset.v' class='invisible'><code>fn <a href='#method.reset' class='fnname'>reset</a>(&amp;self)</code></span></h4>
+<div class='docblock'><p>Resets the cache of all <code>RTerms</code> within the <code>Term</code> tree.</p>
+</div><h4 id='method.eval_to_u32' class='method'><span id='eval_to_u32.v' class='invisible'><code>fn <a href='#method.eval_to_u32' class='fnname'>eval_to_u32</a>(&amp;self) -&gt; <a class='struct' href='../../arrayvec/struct.ArrayVec.html' title='arrayvec::ArrayVec'>ArrayVec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>; 8]</a>&gt;</code></span></h4>
+<div class='docblock'><p>Evaluates the digest/hash result into <code>u32</code>s by rounding the <code>f64</code> bits.</p>
+</div><h4 id='method.hex' class='method'><span id='hex.v' class='invisible'><code>fn <a href='#method.hex' class='fnname'>hex</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></span></h4>
+<div class='docblock'><p>Evaluates the digest/hash result into its ascii hash representation
+by rounding the <code>f64</code> bits.</p>
+</div><h4 id='method.evaluate' class='method'><span id='evaluate.v' class='invisible'><code>fn <a href='#method.evaluate' class='fnname'>evaluate</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;</code></span></h4>
+<div class='docblock'><p>Evaluates the digest/hash results into 256 <code>f64</code>s.</p>
+
+<p>returnval[0] is the MSBit of the first byte. The first byte corresponds
+to the start of the ascii hash representation.</p>
+</div><h4 id='method.nr_of_terms' class='method'><span id='nr_of_terms.v' class='invisible'><code>fn <a href='#method.nr_of_terms' class='fnname'>nr_of_terms</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h4>
+<div class='docblock'><p>Returns the number of <code>Term</code>s that were created to represent this
+instance of the SHA-256 algorithm. The number depends heavily on the
+length of the input data.</p>
+</div><h4 id='method.nr_of_terms_flattened' class='method'><span id='nr_of_terms_flattened.v' class='invisible'><code>fn <a href='#method.nr_of_terms_flattened' class='fnname'>nr_of_terms_flattened</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h4>
+<div class='docblock'><p>Returns the number of <code>Term</code>s that would make the flattened version
+of the tree of each bit of the digest.</p>
+</div><h4 id='method.max_logic_depth_and_max_stack_size' class='method'><span id='max_logic_depth_and_max_stack_size.v' class='invisible'><code>fn <a href='#method.max_logic_depth_and_max_stack_size' class='fnname'>max_logic_depth_and_max_stack_size</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></span></h4>
+<div class='docblock'><p>Max stack size needed when evaluating each bit of the digest recursively.</p>
+
+<p>It also returns the maximum logic depth.</p>
+
+<p>Returns: (max_logic_depth, max_stacksize)</p>
+</div><h4 id='method.statistics' class='method'><span id='statistics.v' class='invisible'><code>fn <a href='#method.statistics' class='fnname'>statistics</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></span></h4>
+<div class='docblock'><p>Returns a String describing the statistics. Same as debug print.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../mostinefficientsha/sha/struct.Sha256.html' title='mostinefficientsha::sha::Sha256'>Sha256</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-530' class='srclink' href='../../src/mostinefficientsha/src/sha.rs.html#251-267' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "mostinefficientsha";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

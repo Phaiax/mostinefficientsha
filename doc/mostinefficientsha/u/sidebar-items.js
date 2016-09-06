@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["U","This type represents a u32, an unsigned number made of 32 bits. The bits are not boolean, but represented by a lazily evaluated tree of `Term`s."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["encode","Generic encoding function with allocation."],["encode_len","Converts an input length to its output length."],["encode_mut","Generic encoding function without allocation."]]});

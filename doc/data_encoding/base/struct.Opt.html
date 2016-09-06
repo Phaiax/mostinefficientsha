@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Opt` struct in crate `data_encoding`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Opt">
+
+    <title>data_encoding::base::Opt - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>data_encoding</a>::<wbr><a href='index.html'>base</a></p><script>window.sidebarCurrent = {name: 'Opt', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>data_encoding</a>::<wbr><a href='index.html'>base</a>::<wbr><a class='struct' href=''>Opt</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-61' class='srclink' href='../../src/data_encoding/base.rs.html#171-195' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Opt&lt;T&gt; {
+    pub val: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'static [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>,
+    pub sym: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'static [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>,
+    pub bit: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>,
+    pub pad: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>,
+    pub _phantom: <a class='struct' href='https://doc.rust-lang.org/nightly/core/marker/struct.PhantomData.html' title='core::marker::PhantomData'>PhantomData</a>&lt;T&gt;,
+}</pre><div class='docblock'><p>Optimized implementation.</p>
+
+<p>This implementation uses static arrays for constant-time lookup.
+It also uses a phantom type to enable static dispatch on demand.</p>
+</div><h2 class='fields'>Fields</h2><span id='structfield.val' class='structfield'>
+                           <span id='val.v' class='invisible'>
+                           <code>val: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'static [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Symbol to value association.</p>
+
+<p>This array must have size 256 and defines <code>val(s)</code> as
+<code>Some(val[s])</code> if <code>val[s] &lt; 128</code> and <code>None</code> otherwise.</p>
+</div><span id='structfield.sym' class='structfield'>
+                           <span id='sym.v' class='invisible'>
+                           <code>sym: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'static [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Value to symbol association.</p>
+
+<p>This array must have size <code>1 &lt;&lt; b</code> and defines <code>sym(v)</code> as
+<code>sym[v]</code>.</p>
+</div><span id='structfield.bit' class='structfield'>
+                           <span id='bit.v' class='invisible'>
+                           <code>bit: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The power of two of the base.</p>
+
+<p>This value defines <code>bit()</code> as <code>bit</code>.</p>
+</div><span id='structfield.pad' class='structfield'>
+                           <span id='pad.v' class='invisible'>
+                           <code>pad: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The padding.</p>
+
+<p>This value defines <code>pad()</code> as <code>pad</code>.</p>
+</div><span id='structfield._phantom' class='structfield'>
+                           <span id='_phantom.v' class='invisible'>
+                           <code>_phantom: <a class='struct' href='https://doc.rust-lang.org/nightly/core/marker/struct.PhantomData.html' title='core::marker::PhantomData'>PhantomData</a>&lt;T&gt;</code>
+                           </span></span><span class='stab '></span><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;T&gt; <a class='trait' href='../../data_encoding/base/trait.Base.html' title='data_encoding::base::Base'>Base</a> for <a class='struct' href='../../data_encoding/base/struct.Opt.html' title='data_encoding::base::Opt'>Opt</a>&lt;T&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-68' class='srclink' href='../../src/data_encoding/base.rs.html#197-214' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.bit' class='method'><span id='bit.v-1' class='invisible'><code>fn <a href='../../data_encoding/base/trait.Base.html#method.bit' class='fnname'>bit</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h4>
+<div class='docblock'><p>Returns the power of two of the base.</p>
+</div><h4 id='method.pad' class='method'><span id='pad.v-1' class='invisible'><code>fn <a href='../../data_encoding/base/trait.Base.html#tymethod.pad' class='fnname'>pad</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code></span></h4>
+<div class='docblock'><p>Returns the padding.</p>
+</div><h4 id='method.val' class='method'><span id='val.v-1' class='invisible'><code>fn <a href='../../data_encoding/base/trait.Base.html#tymethod.val' class='fnname'>val</a>(&amp;self, x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code></span></h4>
+<div class='docblock'><p>Returns the value of a symbol. <a href="../../data_encoding/base/trait.Base.html#tymethod.val">Read more</a></p>
+</div><h4 id='method.sym' class='method'><span id='sym.v-1' class='invisible'><code>fn <a href='../../data_encoding/base/trait.Base.html#method.sym' class='fnname'>sym</a>(&amp;self, x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code></span></h4>
+<div class='docblock'><p>Returns the symbol of a value. <a href="../../data_encoding/base/trait.Base.html#method.sym">Read more</a></p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "data_encoding";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

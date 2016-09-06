@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Sha256","This struct does a lazy SHA-256 hash calculation with fuzzy `f64` bits. It first creates a tree of thouthands of `Term`s that represent the bitwise calculations needed to calculate the final hash. It then calculates that hash by evaluating the `Term`s that represent the bits of the final 256 bit hash value."]]});
