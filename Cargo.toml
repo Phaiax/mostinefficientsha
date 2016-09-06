@@ -1,9 +1,0 @@
-[package]
-name = "mostinefficientsha"
-version = "0.1.0"
-authors = ["Phaiax <phaiax-symbolic@invisibletower.de>"]
-
-[dependencies]
-arrayvec = "0.3.16"
-byteorder = "0.5.3"
-data-encoding = "1.1.2"
