@@ -225,7 +225,16 @@ impl Term {
     }
 
     /// Evaluate this term by recursively evaluating all sub terms.
+    ///
     /// Cache the evaluated value.
+    ///
+    /// `Xor: result = abs(1-b)`
+    ///
+    /// `And: result = a*b`
+    ///
+    /// `Or: result = min[ sqrt(a)+sqrt(b) , 1 ]`
+    ///
+    /// `Not: result = 1-a`
     pub fn evaluate(&self) -> f64 {
         if let Some(c) = self.cached_eval.get() {
             return c;
